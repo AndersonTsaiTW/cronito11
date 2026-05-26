@@ -8,11 +8,27 @@ const TORONTO_CENTER: [number, number] = [-79.3832, 43.6532]
 const INITIAL_ZOOM = 11
 
 function getShelterStatusColor(shelter: Shelter) {
+  if (shelter.gridStatus === 'outage') return '#ef4444' // red for outage
   const occupancyRate = shelter.occupancy / shelter.capacity
-  if (shelter.gridStatus === 'outage' || occupancyRate >= 1) return '#ef4444'
-  if (shelter.requests.length > 0) return '#38bdf8'
-  if (shelter.gridStatus === 'unstable' || occupancyRate >= 0.85) return '#f59e0b'
-  return '#22c55e'
+  if (occupancyRate >= 1) return '#dc2626' // darker red at capacity
+  if (shelter.requests.length > 0) return '#0ea5e9' // bright cyan for requests
+  if (shelter.gridStatus === 'unstable' || occupancyRate >= 0.85) return '#f59e0b' // amber
+  return '#22c55e' // green when healthy
+}
+
+function getShelterMarkerSize(shelter: Shelter): number {
+  const occupancyRate = Math.min(1, shelter.occupancy / shelter.capacity)
+  // Size ranges from 24px to 48px based on occupancy
+  return 24 + occupancyRate * 24
+}
+
+function getShelterMarkerIcon(shelter: Shelter): string {
+  if (shelter.gridStatus === 'outage') return '⚡'
+  if (shelter.requests.length > 0) return '🆘'
+  const occupancyRate = shelter.occupancy / shelter.capacity
+  if (occupancyRate >= 1) return '🚫'
+  if (occupancyRate >= 0.85) return '⚠️'
+  return shelter.type === 'cooling_center' ? '❄️' : shelter.type === 'warming_center' ? '🔥' : '🏢'
 }
 
 export default function MapView() {
@@ -161,15 +177,23 @@ export default function MapView() {
     markersRef.current.forEach((m) => m.remove())
     markersRef.current = shelters.map((shelter) => {
       const isSelected = shelter.id === selectedShelterId
+      const size = getShelterMarkerSize(shelter)
       const el = document.createElement('button')
       el.type = 'button'
       el.className = `shelter-marker${isSelected ? ' shelter-marker--selected' : ''}`
       el.style.setProperty('--marker-color', getShelterStatusColor(shelter))
+      el.style.setProperty('--marker-size', `${size}px`)
+      el.style.width = `${size}px`
+      el.style.height = `${size}px`
       el.title = `${shelter.name} - ${shelter.occupancy}/${shelter.capacity} occupied`
       el.setAttribute('aria-label', `Select ${shelter.name}`)
+      
       const inner = document.createElement('span')
       inner.className = 'shelter-marker__inner'
+      inner.textContent = getShelterMarkerIcon(shelter)
+      inner.style.fontSize = `${Math.max(12, size * 0.5)}px`
       el.appendChild(inner)
+      
       el.addEventListener('click', () => selectShelter(shelter.id))
       return new mapboxgl.Marker({ element: el, anchor: 'center' })
         .setLngLat(shelter.coordinates)

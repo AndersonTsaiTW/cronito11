@@ -92,11 +92,12 @@ export const shelters: Shelter[] = [
       "Shelter"
     ],
     requests: [
-      "Redistribution support"
+      "Urgent: Additional fuel for generator",
+      "Seeking staff support for overnight shift"
     ],
     reports: [
-      "Power outage affecting operations",
-      "At or near capacity"
+      "Power outage affecting operations - on generator",
+      "At or near capacity - considering redistribution"
     ],
     resilienceScore: 59,
     sourceName: "City of Toronto Open Data + demo energy estimates",
@@ -142,11 +143,13 @@ export const shelters: Shelter[] = [
       "Motel/Hotel Shelter"
     ],
     requests: [
-      "Redistribution support"
+      "Critical: Cooling units needed immediately",
+      "Requesting portable AC units"
     ],
     reports: [
-      "Power outage affecting operations",
-      "At or near capacity"
+      "Power outage - no AC available",
+      "At full capacity - overflow outside",
+      "Temperature inside reached 29°C - health risk"
     ],
     resilienceScore: 55,
     sourceName: "City of Toronto Open Data + demo energy estimates",
@@ -245,10 +248,11 @@ export const shelters: Shelter[] = [
       "Motel/Hotel Shelter"
     ],
     requests: [
-      "Redistribution support"
+      "Grid stabilization support requested"
     ],
     reports: [
-      "Grid instability reported"
+      "Grid instability - battery system engaged",
+      "Solar panels generating 45kW - helping offset grid"
     ],
     resilienceScore: 85,
     sourceName: "City of Toronto Open Data + demo energy estimates",

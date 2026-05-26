@@ -1,18 +1,12 @@
+import { useState } from 'react'
 import { useAppStore } from '../store'
 import type { Shelter } from '../types'
 
-const TYPE_LABELS: Record<Shelter['type'], string> = {
-  shelter: 'Shelter',
-  cooling_center: 'Cooling Center',
-  warming_center: 'Warming Center',
-  resilience_hub: 'Resilience Hub',
-}
-
-const TYPE_COLORS: Record<Shelter['type'], string> = {
-  shelter: 'bg-blue-900 text-blue-300',
-  cooling_center: 'bg-cyan-900 text-cyan-300',
-  warming_center: 'bg-orange-900 text-orange-300',
-  resilience_hub: 'bg-purple-900 text-purple-300',
+const TYPE_ICONS: Record<Shelter['type'], string> = {
+  shelter: '🏢',
+  cooling_center: '❄️',
+  warming_center: '🔥',
+  resilience_hub: '⚡',
 }
 
 const GRID_CONFIG: Record<Shelter['gridStatus'], { label: string; color: string; dot: string }> = {
@@ -21,179 +15,243 @@ const GRID_CONFIG: Record<Shelter['gridStatus'], { label: string; color: string;
   outage:   { label: 'Outage',   color: 'text-red-400',    dot: 'bg-red-400'    },
 }
 
-function Bar({ pct, color }: { pct: number; color: string }) {
-  return (
-    <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
-      <div className={`h-full ${color} rounded-full transition-all`} style={{ width: `${pct}%` }} />
-    </div>
-  )
-}
-
-function Section({ title, titleColor = 'text-gray-400', children }: {
-  title: string
-  titleColor?: string
-  children: React.ReactNode
-}) {
-  return (
-    <div>
-      <p className={`text-xs uppercase tracking-wider font-semibold mb-2 ${titleColor}`}>{title}</p>
-      {children}
-    </div>
-  )
-}
-
-function ShelterDetails({ shelter }: { shelter: Shelter }) {
-  const occupancyPct = Math.min(100, Math.round((shelter.occupancy / shelter.capacity) * 100))
-  const scoreColor = shelter.resilienceScore >= 70 ? 'text-green-400' : shelter.resilienceScore >= 40 ? 'text-yellow-400' : 'text-red-400'
-  const scoreBarColor = shelter.resilienceScore >= 70 ? 'bg-green-500' : shelter.resilienceScore >= 40 ? 'bg-yellow-400' : 'bg-red-500'
-  const occupancyBarColor = occupancyPct >= 100 ? 'bg-red-500' : occupancyPct >= 85 ? 'bg-yellow-400' : 'bg-green-500'
-  const grid = GRID_CONFIG[shelter.gridStatus]
-  const runtimeColor = shelter.estimatedRuntimeHours >= 24 ? 'text-green-400' : shelter.estimatedRuntimeHours >= 8 ? 'text-yellow-400' : 'text-red-400'
-
-  return (
-    <div className="flex flex-col gap-4">
-      {/* Resilience Score */}
-      <Section title="Resilience Score">
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-gray-500 text-xs">0 – 100</span>
-          <span className={`text-xl font-bold tabular-nums ${scoreColor}`}>{shelter.resilienceScore}</span>
-        </div>
-        <Bar pct={shelter.resilienceScore} color={scoreBarColor} />
-      </Section>
-
-      {/* Capacity */}
-      <Section title="Capacity">
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-gray-300 text-sm">{shelter.occupancy} / {shelter.capacity} occupied</span>
-          <span className="text-gray-500 text-xs">{occupancyPct}%</span>
-        </div>
-        <Bar pct={occupancyPct} color={occupancyBarColor} />
-      </Section>
-
-      {/* Energy */}
-      <Section title="Energy">
-        <div className="flex flex-col gap-1.5 text-sm">
-          <div className="flex items-center gap-2">
-            <span className={`w-2 h-2 rounded-full shrink-0 ${grid.dot}`} />
-            <span className="text-gray-400">Grid:</span>
-            <span className={grid.color}>{grid.label}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full shrink-0 bg-gray-600" />
-            <span className="text-gray-400">Generator:</span>
-            <span className="text-gray-300">
-              {shelter.generator === 'none' ? 'None' : shelter.generator === 'manual' ? 'Manual' : 'Automatic'}
-              {shelter.generatorFuelType ? ` · ${shelter.generatorFuelType}` : ''}
-            </span>
-          </div>
-          {shelter.batteryKWh > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full shrink-0 bg-gray-600" />
-              <span className="text-gray-400">Battery:</span>
-              <span className="text-gray-300">
-                {shelter.batteryKWh} kWh{shelter.batterySOC !== undefined ? ` (${shelter.batterySOC}%)` : ''}
-              </span>
-            </div>
-          )}
-          {shelter.solarKW > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full shrink-0 bg-gray-600" />
-              <span className="text-gray-400">Solar:</span>
-              <span className="text-gray-300">{shelter.solarKW} kW</span>
-            </div>
-          )}
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full shrink-0 bg-gray-600" />
-            <span className="text-gray-400">Backup runtime:</span>
-            <span className={`font-medium ${runtimeColor}`}>{shelter.estimatedRuntimeHours}h</span>
-          </div>
-        </div>
-      </Section>
-
-      {/* Services */}
-      {shelter.services.length > 0 && (
-        <Section title="Services">
-          <div className="flex flex-wrap gap-1.5">
-            {shelter.services.map((s) => (
-              <span key={s} className="bg-gray-800 text-gray-300 text-xs px-2 py-0.5 rounded-full">
-                {s}
-              </span>
-            ))}
-          </div>
-        </Section>
-      )}
-
-      {/* Requests */}
-      {shelter.requests.length > 0 && (
-        <Section title="Needs Support" titleColor="text-yellow-400">
-          <div className="flex flex-col gap-1">
-            {shelter.requests.map((r) => (
-              <p key={r} className="text-sm text-yellow-300 flex items-start gap-2">
-                <span className="shrink-0 mt-0.5">!</span>
-                {r}
-              </p>
-            ))}
-          </div>
-        </Section>
-      )}
-
-      {/* Reports */}
-      {shelter.reports.length > 0 && (
-        <Section title="Reports" titleColor="text-red-400">
-          <div className="flex flex-col gap-1">
-            {shelter.reports.map((r) => (
-              <p key={r} className="text-sm text-red-300 flex items-start gap-2">
-                <span className="shrink-0 mt-0.5">·</span>
-                {r}
-              </p>
-            ))}
-          </div>
-        </Section>
-      )}
-
-      {/* Source */}
-      <div className="pt-2 border-t border-gray-800">
-        <p className="text-gray-600 text-xs leading-relaxed">
-          {shelter.sourceName}
-          {shelter.lastUpdated ? ` · ${shelter.lastUpdated}` : ''}
-        </p>
-      </div>
-    </div>
-  )
-}
-
 export default function ShelterPanel() {
-  const { shelters, selectedShelterId, selectShelter } = useAppStore()
-  const shelter = shelters.find((s) => s.id === selectedShelterId)
+  const { selectedShelterId, selectShelter, shelters } = useAppStore()
+  const [showFullDetails, setShowFullDetails] = useState(false)
+
+  const shelter = selectedShelterId ? shelters.find(s => s.id === selectedShelterId) : null
 
   if (!shelter) return null
 
+  const occupancyPct = Math.min(100, Math.round((shelter.occupancy / shelter.capacity) * 100))
+  const grid = GRID_CONFIG[shelter.gridStatus]
+
+  const isAtCapacity = occupancyPct >= 100
+  const hasOutage = shelter.gridStatus === 'outage'
+  const hasRequests = shelter.requests.length > 0
+
   return (
-    <div className="absolute top-0 right-0 h-full w-80 bg-gray-900 border-l border-gray-700 shadow-2xl overflow-y-auto z-10 flex flex-col">
-      {/* Sticky header */}
-      <div className="sticky top-0 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 px-4 py-3 z-10">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mb-1.5 ${TYPE_COLORS[shelter.type]}`}>
-              {TYPE_LABELS[shelter.type]}
-            </span>
-            <h2 className="text-white font-semibold text-sm leading-snug">{shelter.name}</h2>
-            <p className="text-gray-500 text-xs mt-0.5">{shelter.address}, {shelter.city}</p>
+    <>
+      {/* Floating Card - Bottom-Right (Waze-style) */}
+      <div className="fixed bottom-28 right-6 z-10 w-96 max-w-[calc(100vw-48px)]">
+        <div className="bg-gradient-to-b from-gray-800 to-gray-900 rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-gray-700 to-gray-800 px-6 py-4 flex items-start justify-between">
+            <div className="flex items-start gap-3 flex-1">
+              <span className="text-4xl">{TYPE_ICONS[shelter.type]}</span>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-white text-lg leading-tight">{shelter.name}</h3>
+                <p className="text-gray-400 text-xs mt-1">{shelter.address}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => selectShelter(null)}
+              className="text-gray-400 hover:text-white transition-colors text-2xl leading-none"
+            >
+              ×
+            </button>
           </div>
-          <button
-            onClick={() => selectShelter(null)}
-            className="text-gray-500 hover:text-white transition-colors shrink-0 p-1 -mr-1"
-            aria-label="Close"
-          >
-            ✕
-          </button>
+
+          {/* Quick Stats */}
+          <div className="px-6 py-4 space-y-3 border-b border-gray-700">
+            {/* Occupancy */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-300">Occupancy</span>
+                <span className={`text-lg font-bold ${
+                  occupancyPct >= 100 ? 'text-red-400' : occupancyPct >= 85 ? 'text-yellow-400' : 'text-green-400'
+                }`}>
+                  {shelter.occupancy}/{shelter.capacity}
+                </span>
+              </div>
+              <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                <div
+                  className={`h-full transition-all ${
+                    occupancyPct >= 100 ? 'bg-red-500' : occupancyPct >= 85 ? 'bg-yellow-400' : 'bg-green-500'
+                  }`}
+                  style={{ width: `${Math.min(100, occupancyPct)}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Grid & Resilience */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gray-750 rounded-lg p-3">
+                <p className="text-xs text-gray-400 mb-1">⚡ Grid</p>
+                <p className={`font-bold ${grid.color}`}>{grid.label}</p>
+              </div>
+              <div className="bg-gray-750 rounded-lg p-3">
+                <p className="text-xs text-gray-400 mb-1">📈 Resilience</p>
+                <p className={`font-bold ${
+                  shelter.resilienceScore >= 70 ? 'text-green-400' : 
+                  shelter.resilienceScore >= 40 ? 'text-yellow-400' : 'text-red-400'
+                }`}>{shelter.resilienceScore}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Status Alerts */}
+          {(hasOutage || isAtCapacity || hasRequests) && (
+            <div className="px-6 py-3 space-y-2 border-b border-gray-700 bg-gray-850">
+              {hasOutage && (
+                <div className="flex items-center gap-2 text-red-400 text-sm">
+                  <span>⚡</span>
+                  <span className="font-medium">Power outage</span>
+                </div>
+              )}
+              {isAtCapacity && (
+                <div className="flex items-center gap-2 text-yellow-400 text-sm">
+                  <span>🚫</span>
+                  <span className="font-medium">At full capacity</span>
+                </div>
+              )}
+              {hasRequests && (
+                <div className="flex items-center gap-2 text-cyan-400 text-sm">
+                  <span>🆘</span>
+                  <span className="font-medium">{shelter.requests.length} active request(s)</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="px-6 py-3 space-y-2">
+            <button
+              onClick={() => setShowFullDetails(!showFullDetails)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <span>ℹ️</span>
+              {showFullDetails ? 'Hide Details' : 'View Full Details'}
+            </button>
+            <button className="w-full bg-red-600/20 hover:bg-red-600/30 text-red-400 font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-2 border border-red-600/50">
+              <span>📋</span>
+              Report Issue
+            </button>
+            <button className="w-full bg-cyan-600/20 hover:bg-cyan-600/30 text-cyan-400 font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-2 border border-cyan-600/50">
+              <span>✏️</span>
+              Share Update
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Scrollable content */}
-      <div className="px-4 py-4 flex-1">
-        <ShelterDetails shelter={shelter} />
-      </div>
-    </div>
+      {/* Full Details Modal */}
+      {showFullDetails && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-4">
+          <div className="bg-gray-900 rounded-2xl w-full sm:w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-800">
+            <div className="sticky top-0 bg-gradient-to-r from-gray-800 to-gray-700 px-6 py-4 flex items-center justify-between border-b border-gray-700">
+              <h2 className="text-xl font-bold text-white">{shelter.name}</h2>
+              <button
+                onClick={() => setShowFullDetails(false)}
+                className="text-gray-400 hover:text-white text-2xl"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Energy Info */}
+              <div>
+                <h3 className="text-lg font-bold text-white mb-4">⚡ Energy Infrastructure</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                    <p className="text-xs text-gray-400 uppercase mb-2">Generator</p>
+                    <p className="font-bold text-white">
+                      {shelter.generator === 'none' ? 'None' : 
+                       shelter.generator === 'manual' ? 'Manual' : 'Automatic'}
+                    </p>
+                    {shelter.generatorFuelType && (
+                      <p className="text-sm text-gray-400 mt-1">
+                        {shelter.generatorFuelType} · {shelter.fuelHoursRemaining}h fuel
+                      </p>
+                    )}
+                  </div>
+                  <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                    <p className="text-xs text-gray-400 uppercase mb-2">Battery</p>
+                    <p className="font-bold text-white">{shelter.batteryKWh} kWh</p>
+                    {shelter.batterySOC && (
+                      <p className="text-sm text-gray-400 mt-1">{shelter.batterySOC}% charged</p>
+                    )}
+                  </div>
+                  {shelter.solarKW > 0 && (
+                    <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                      <p className="text-xs text-gray-400 uppercase mb-2">Solar</p>
+                      <p className="font-bold text-white">{shelter.solarKW} kW</p>
+                    </div>
+                  )}
+                  <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                    <p className="text-xs text-gray-400 uppercase mb-2">Runtime</p>
+                    <p className="font-bold text-white">{shelter.estimatedRuntimeHours}h</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Services */}
+              <div>
+                <h3 className="text-lg font-bold text-white mb-4">🔧 Services</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[
+                    { emoji: '❄️', label: 'Cooling', value: shelter.cooling },
+                    { emoji: '🔥', label: 'Heating', value: shelter.heating },
+                    { emoji: '🔌', label: 'Charging', value: shelter.charging },
+                    { emoji: '⚕️', label: 'Medical', value: shelter.medicalSupport },
+                    { emoji: '💧', label: 'Water', value: shelter.water },
+                    { emoji: '🍽️', label: 'Food', value: shelter.food },
+                    { emoji: '♿', label: 'Accessible', value: shelter.accessible },
+                    { emoji: '🐾', label: 'Pets', value: shelter.petsAllowed },
+                  ].map((service) => (
+                    <div
+                      key={service.label}
+                      className={`p-3 rounded-lg border text-center ${
+                        service.value
+                          ? 'bg-green-900/30 border-green-700'
+                          : 'bg-gray-800 border-gray-700 opacity-40'
+                      }`}
+                    >
+                      <p className="text-2xl mb-1">{service.emoji}</p>
+                      <p className={`text-xs font-medium ${
+                        service.value ? 'text-green-400' : 'text-gray-500'
+                      }`}>
+                        {service.label}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Requests & Reports */}
+              {(shelter.requests.length > 0 || shelter.reports.length > 0) && (
+                <div className="space-y-4">
+                  {shelter.requests.length > 0 && (
+                    <div>
+                      <h4 className="text-red-400 font-bold mb-2">🆘 Active Requests</h4>
+                      <div className="space-y-2">
+                        {shelter.requests.map((req, i) => (
+                          <div key={i} className="bg-red-900/20 border border-red-700 rounded p-2 text-sm text-gray-200">
+                            {req}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {shelter.reports.length > 0 && (
+                    <div>
+                      <h4 className="text-yellow-400 font-bold mb-2">📋 Recent Reports</h4>
+                      <div className="space-y-2">
+                        {shelter.reports.map((rep, i) => (
+                          <div key={i} className="bg-yellow-900/20 border border-yellow-700 rounded p-2 text-sm text-gray-200">
+                            {rep}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
