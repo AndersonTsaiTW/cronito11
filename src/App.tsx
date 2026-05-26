@@ -1,5 +1,6 @@
 import MapView from './components/MapView'
 import LayerControls from './components/LayerControls'
+import ShelterPanel from './components/ShelterPanel'
 
 export default function App() {
   return (
@@ -8,6 +9,7 @@ export default function App() {
         <MapView />
       </div>
       <LayerControls />
+      <ShelterPanel />
     </div>
   )
 }

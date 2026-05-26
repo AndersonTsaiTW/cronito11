@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { shelters as initialShelters } from './data/shelters'
 import type { LayerId, Shelter } from './types'
 
 interface AppState {
@@ -18,7 +19,7 @@ export const useAppStore = create<AppState>((set) => ({
     grid_stress: false,
     social_vulnerability: false,
   },
-  shelters: [],
+  shelters: initialShelters,
   selectedShelterId: null,
   toggleLayer: (id) =>
     set((state) => ({

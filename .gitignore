@@ -145,3 +145,5 @@ vite.config.ts.timestamp-*
 # docs
 docs/
 data/
+!src/data/
+!src/data/**
