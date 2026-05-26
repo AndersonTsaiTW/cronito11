@@ -18,6 +18,7 @@ export const useAppStore = create<AppState>((set) => ({
     outage: false,
     grid_stress: false,
     social_vulnerability: false,
+    older_adults: false,
   },
   shelters: initialShelters,
   selectedShelterId: null,

@@ -7,6 +7,7 @@ const LAYERS: { id: LayerId; label: string; color: string }[] = [
   { id: 'outage', label: 'Power Outage', color: 'bg-yellow-400' },
   { id: 'grid_stress', label: 'Grid Stress', color: 'bg-purple-500' },
   { id: 'social_vulnerability', label: 'Community Need', color: 'bg-green-500' },
+  { id: 'older_adults', label: 'Older Adults 65+', color: 'bg-pink-500' },
 ]
 
 export default function LayerControls() {

@@ -39,6 +39,7 @@ export type LayerId =
   | 'outage'
   | 'grid_stress'
   | 'social_vulnerability'
+  | 'older_adults'
 
 export type RiskLayerFeatureProperties = {
   id: string
