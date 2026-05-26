@@ -1,14 +1,18 @@
 import { create } from 'zustand'
 import { shelters as initialShelters } from './data/shelters'
-import type { LayerId, Shelter } from './types'
+import type { ForecastOffset, ForecastTemperaturePoint, LayerId, Shelter } from './types'
 
 interface AppState {
   visibleLayers: Record<LayerId, boolean>
   shelters: Shelter[]
   selectedShelterId: string | null
+  forecastPoints: ForecastTemperaturePoint[]
+  forecastOffset: ForecastOffset
   toggleLayer: (id: LayerId) => void
   setShelters: (shelters: Shelter[]) => void
   selectShelter: (id: string | null) => void
+  setForecastPoints: (points: ForecastTemperaturePoint[]) => void
+  setForecastOffset: (offset: ForecastOffset) => void
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -19,9 +23,12 @@ export const useAppStore = create<AppState>((set) => ({
     grid_stress: false,
     social_vulnerability: false,
     older_adults: false,
+    forecast_temperature: false,
   },
   shelters: initialShelters,
   selectedShelterId: null,
+  forecastPoints: [],
+  forecastOffset: 'current',
   toggleLayer: (id) =>
     set((state) => ({
       visibleLayers: {
@@ -31,4 +38,6 @@ export const useAppStore = create<AppState>((set) => ({
     })),
   setShelters: (shelters) => set({ shelters }),
   selectShelter: (id) => set({ selectedShelterId: id }),
+  setForecastPoints: (points) => set({ forecastPoints: points }),
+  setForecastOffset: (offset) => set({ forecastOffset: offset }),
 }))
