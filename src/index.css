@@ -235,3 +235,80 @@ html, body, #root {
     opacity: 0;
   }
 }
+
+/* Forecast temperature badge markers */
+.temp-badge {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(17, 24, 39, 0.90);
+  border: 1.5px solid var(--badge-color, #6b7280);
+  border-radius: 8px;
+  padding: 4px 9px 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.temp-badge:hover,
+.temp-badge:focus-visible {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--badge-color) 30%, transparent),
+    0 6px 16px rgba(0, 0, 0, 0.5);
+  outline: none;
+}
+
+/* small colored top accent line */
+.temp-badge::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: var(--badge-color, #6b7280);
+  border-radius: 0 0 2px 2px;
+}
+
+.temp-badge__warn {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.temp-badge__city {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  color: #9ca3af;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.temp-badge__temp {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: #f9fafb;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* Mapbox weather popup overrides */
+.weather-popup .mapboxgl-popup-content {
+  padding: 12px 14px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  border: 1px solid #e5e7eb;
+}
+
+.weather-popup .mapboxgl-popup-tip {
+  border-top-color: #fff;
+}
