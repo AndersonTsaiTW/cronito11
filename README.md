@@ -104,11 +104,19 @@ cronito11/
 
 ## Data Sources
 
-- **Shelters** — [City of Toronto Daily Shelter & Overnight Service Occupancy/Capacity](https://open.toronto.ca/dataset/daily-shelter-overnight-service-occupancy-capacity/)  
-  Names, addresses, capacity, and occupancy are real. Energy fields (generator, battery, solar) are demo estimates.
-- **Flood** — Toronto Region Conservation Authority (TRCA) flood plain data
-- **Community Need / Older Adults** — City of Toronto Neighbourhood Profiles 2021
-- **Forecast Temperature** — [ECCC MSC GeoMet](https://api.weather.gc.ca/) `citypageweather-realtime` collection (OGC API Features, public, no auth required)
+- **Weather / Forecast Temperature** — [Environment and Climate Change Canada (ECCC) MSC GeoMet](https://api.weather.gc.ca/) `citypageweather-realtime` collection.
+  The app fetches live data from `https://api.weather.gc.ca/collections/citypageweather-realtime/items?f=json&bbox=-80.2,43.3,-78.7,44.1&lang=en`, then filters the response to Toronto, Toronto Island, Mississauga, Vaughan, Richmond Hill, Markham, Pickering, and Oakville. The weather badge layer uses current temperature, humidex, today high, tomorrow high, warning flags, and ECCC update time. Public OGC API Features endpoint; no API key required. If the API request fails, `src/services/weather.ts` falls back to clearly demo-only mock forecast values for those same cities.
+- **Shelters** — [City of Toronto Daily Shelter & Overnight Service Occupancy/Capacity](https://open.toronto.ca/dataset/daily-shelter-overnight-service-occupancy-capacity/).
+  Names, addresses, service types, capacity, and occupancy come from the local raw export at `data/daily-shelter-overnight-service-occupancy-capacity-2025.json`. `scripts/process-shelters.js` aggregates the latest date in that file and generates `src/data/shelters.ts`.
+- **Shelter Coordinates / Geocoding** — [Mapbox Geocoding API](https://docs.mapbox.com/api/search/geocoding/).
+  Used by `scripts/process-shelters.js --geocode` to turn shelter addresses into map coordinates, cached in `data/geocoded-shelter-locations.json`. Requires `VITE_MAPBOX_TOKEN`.
+- **Shelter Energy / Resilience Fields** — Demo estimates generated in `scripts/process-shelters.js`.
+  Grid status, generator type, fuel, battery, solar, runtime, active requests, reports, and resilience score are simulated for the hackathon demo; they are not official operational data.
+- **Flood Risk** — Toronto Region Conservation Authority (TRCA) flood plain polygons, stored in `public/layers/flood.geojson`.
+- **Community Need / Older Adults** — [City of Toronto Neighbourhood Profiles 2021](https://open.toronto.ca/dataset/neighbourhood-profiles/), joined with local Toronto neighbourhood boundary GeoJSON by `scripts/process-neighbourhood-profiles.ps1`.
+  The Community Need Index is a project-created demo composite, not an official City of Toronto score. It averages normalized children share, older-adult share, low-income rate, unemployment rate, and tenant shelter cost burden rate.
+- **Map Basemap** — [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/) using the Mapbox `dark-v11` style. Requires `VITE_MAPBOX_TOKEN`.
+- **Heat Risk / Power Outage / Grid Stress Layers** — Demo layer toggles/placeholders for the hackathon prototype. They are not currently backed by official live datasets.
 
 > Demo data is clearly labeled in the UI and not intended for actual emergency response decisions.
 
