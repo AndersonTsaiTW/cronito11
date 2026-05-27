@@ -40,6 +40,26 @@ export type LayerId =
   | 'grid_stress'
   | 'social_vulnerability'
   | 'older_adults'
+  | 'forecast_temperature'
+
+export type ForecastOffset = 'current' | 'today_high' | 'tomorrow_high'
+
+export type ForecastTemperaturePoint = {
+  id: string
+  name: string
+  region: string
+  coordinates: [number, number]
+  currentTemperatureC: number | null
+  todayHighC: number | null
+  tomorrowHighC: number | null
+  humidex: number | null
+  riskLevel: 'low' | 'medium' | 'high' | 'extreme'
+  displayTempC: number | null
+  warnings: boolean
+  sourceName: 'ECCC MSC GeoMet citypageweather-realtime'
+  sourceUrl: string
+  lastUpdated: string
+}
 
 export type RiskLayerFeatureProperties = {
   id: string

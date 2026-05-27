@@ -12,7 +12,7 @@ export default function QuickStats() {
   }
 
   return (
-    <div className="fixed top-4 right-4 z-10 backdrop-blur-md bg-gray-900/80 border border-gray-700 rounded-2xl shadow-xl overflow-hidden">
+    <div className="fixed top-4 right-20 z-10 backdrop-blur-md bg-gray-900/80 border border-gray-700 rounded-2xl shadow-xl overflow-hidden">
       <div className="grid grid-cols-3 divide-x divide-gray-700">
         {/* Outages */}
         <div className="px-4 py-3 text-center hover:bg-gray-800/50 transition-colors cursor-help" title="Active power outages">

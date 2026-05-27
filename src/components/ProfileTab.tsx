@@ -16,10 +16,38 @@ const TYPE_ICONS: Record<Shelter['type'], string> = {
 }
 
 export default function ProfileTab() {
-  const { shelters, selectedShelterId, selectShelter } = useAppStore()
+  const { 
+    shelters, 
+    selectedShelterId, 
+    selectShelter,
+    filterOccupancy,
+    filterPower,
+    filterServices,
+  } = useAppStore()
+
+  // Apply filters
+  const filteredShelters = shelters.filter((s) => {
+    // Occupancy filter
+    if (filterOccupancy === 'available' && s.occupancy >= s.capacity) return false
+    if (filterOccupancy === 'full' && s.occupancy < s.capacity) return false
+
+    // Power filter
+    if (filterPower !== 'all' && s.gridStatus !== filterPower) return false
+
+    // Services filter
+    if (filterServices.length > 0) {
+      const hasAllServices = filterServices.every((serviceId) => {
+        const serviceKey = serviceId as keyof Shelter
+        return s[serviceKey] as boolean
+      })
+      if (!hasAllServices) return false
+    }
+
+    return true
+  })
 
   return (
-    <div className="pt-6 pb-32 px-6 h-screen overflow-y-auto bg-gray-950">
+    <div className="pt-6 pb-40 px-6 h-screen overflow-y-auto bg-gray-950">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-white mb-2">Shelter Directory</h1>
         <p className="text-gray-400 mb-6">Browse shelter profiles and energy capacity details</p>
@@ -28,9 +56,9 @@ export default function ProfileTab() {
           {/* Shelter List */}
           <div className="lg:col-span-1">
             <div className="sticky top-24">
-              <h2 className="text-lg font-bold text-white mb-4">Shelters ({shelters.length})</h2>
+              <h2 className="text-lg font-bold text-white mb-4">Shelters ({filteredShelters.length})</h2>
               <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto">
-                {shelters.map((shelter) => (
+                {filteredShelters.map((shelter) => (
                   <ShelterListItem
                     key={shelter.id}
                     shelter={shelter}
@@ -46,7 +74,7 @@ export default function ProfileTab() {
           <div className="lg:col-span-2">
             {selectedShelterId ? (
               <>
-                {shelters
+                {filteredShelters
                   .filter((s) => s.id === selectedShelterId)
                   .map((shelter) => (
                     <ShelterDetailCard key={shelter.id} shelter={shelter} />

@@ -20,7 +20,7 @@ export default function DashboardTab() {
   const occupancyPct = Math.round((stats.totalOccupancy / stats.totalCapacity) * 100)
 
   return (
-    <div className="pt-6 pb-32 px-6 h-screen overflow-y-auto bg-gray-950">
+    <div className="pt-6 pb-40 px-6 h-screen overflow-y-auto bg-gray-950">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-4xl font-bold text-white mb-2">Shelter Resilience Dashboard</h1>
         <p className="text-gray-400 mb-8">Real-time overview of shelter capacity, energy, and resilience</p>

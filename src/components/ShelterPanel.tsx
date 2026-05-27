@@ -16,10 +16,11 @@ const GRID_CONFIG: Record<Shelter['gridStatus'], { label: string; color: string;
 }
 
 export default function ShelterPanel() {
-  const { selectedShelterId, selectShelter, shelters } = useAppStore()
+  const { selectedShelterId, selectShelter, shelters, recommendedShelterId } = useAppStore()
   const [showFullDetails, setShowFullDetails] = useState(false)
 
   const shelter = selectedShelterId ? shelters.find(s => s.id === selectedShelterId) : null
+  const isRecommended = selectedShelterId === recommendedShelterId
 
   if (!shelter) return null
 
@@ -33,13 +34,18 @@ export default function ShelterPanel() {
   return (
     <>
       {/* Floating Card - Bottom-Right (Waze-style) */}
-      <div className="fixed bottom-28 right-6 z-10 w-96 max-w-[calc(100vw-48px)]">
+      <div className="fixed bottom-28 right-4 sm:right-6 z-10 w-full sm:w-96 max-w-[calc(100vw-32px)] sm:max-w-[calc(100vw-48px)]">
         <div className="bg-gradient-to-b from-gray-800 to-gray-900 rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-gray-700 to-gray-800 px-6 py-4 flex items-start justify-between">
             <div className="flex items-start gap-3 flex-1">
               <span className="text-4xl">{TYPE_ICONS[shelter.type]}</span>
               <div className="flex-1 min-w-0">
+                {isRecommended && (
+                  <div className="inline-flex items-center gap-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-bold px-3 py-1 rounded-full mb-2 shadow-lg shadow-green-500/50 animate-pulse">
+                    ⭐ RECOMMENDED
+                  </div>
+                )}
                 <h3 className="font-bold text-white text-lg leading-tight">{shelter.name}</h3>
                 <p className="text-gray-400 text-xs mt-1">{shelter.address}</p>
               </div>

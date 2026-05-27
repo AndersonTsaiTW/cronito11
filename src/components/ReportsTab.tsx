@@ -42,7 +42,7 @@ export default function ReportsTab() {
   }
 
   return (
-    <div className="pt-6 pb-32 px-6 h-screen overflow-y-auto bg-gray-950">
+    <div className="pt-6 pb-40 px-6 h-screen overflow-y-auto bg-gray-950">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-white mb-2">Live Updates</h1>
         <p className="text-gray-400 mb-6">Real-time reports and requests from shelters</p>
