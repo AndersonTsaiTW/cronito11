@@ -1,4 +1,4 @@
-# Resilience Map — Seneca Hackathon 2026
+# WattsShield — Seneca Hackathon 2026
 
 An interactive map-based platform that helps emergency coordinators and the public locate shelters, cooling/warming centers, and resilience hubs in Toronto during climate and energy crises.
 
