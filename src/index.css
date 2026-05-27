@@ -1,0 +1,314 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.shelter-marker {
+  width: var(--marker-size, 22px);
+  height: var(--marker-size, 22px);
+  padding: 0;
+  border: 3px solid rgba(255, 255, 255, 0.95);
+  border-radius: 999px;
+  background: var(--marker-color);
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.2),
+    0 8px 18px rgba(0, 0, 0, 0.38);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease,
+    width 200ms ease,
+    height 200ms ease;
+  position: relative;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.shelter-marker::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.shelter-marker:hover,
+.shelter-marker:focus-visible {
+  transform: scale(1.2);
+  box-shadow:
+    0 0 0 5px color-mix(in srgb, var(--marker-color) 26%, transparent),
+    0 10px 24px rgba(0, 0, 0, 0.42);
+  outline: none;
+}
+
+.shelter-marker--selected {
+  border-color: #111827;
+  box-shadow:
+    0 0 0 5px rgba(59, 130, 246, 0.8),
+    0 10px 24px rgba(0, 0, 0, 0.44);
+  transform: scale(1.25);
+}
+
+.shelter-marker--recommended {
+  border-color: #10b981;
+  animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.shelter-marker--recommended::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border: 2px solid rgba(16, 185, 129, 0.6);
+  border-radius: 999px;
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.2),
+      0 0 12px rgba(16, 185, 129, 0.8),
+      0 8px 18px rgba(0, 0, 0, 0.38);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.2),
+      0 0 24px rgba(16, 185, 129, 1),
+      0 8px 18px rgba(0, 0, 0, 0.38);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+.shelter-marker__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  z-index: 1;
+  font-size: inherit;
+}
+
+/* Forecast temperature badge markers */
+.temp-badge {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(17, 24, 39, 0.90);
+  border: 1.5px solid var(--badge-color, #6b7280);
+  border-radius: 8px;
+  padding: 4px 9px 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.temp-badge:hover,
+.temp-badge:focus-visible {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--badge-color) 30%, transparent),
+    0 6px 16px rgba(0, 0, 0, 0.5);
+  outline: none;
+}
+
+/* small colored top accent line */
+.temp-badge::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: var(--badge-color, #6b7280);
+  border-radius: 0 0 2px 2px;
+}
+
+.temp-badge__warn {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.temp-badge__city {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  color: #9ca3af;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.temp-badge__temp {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: #f9fafb;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* Mapbox weather popup overrides */
+.weather-popup .mapboxgl-popup-content {
+  padding: 12px 14px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  border: 1px solid #e5e7eb;
+}
+
+.weather-popup .mapboxgl-popup-tip {
+  border-top-color: #fff;
+}
+
+/* User location marker */
+.user-location-marker {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: 3px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3), 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+.user-location-marker::before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px #3b82f6;
+}
+
+.user-location-marker::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* Forecast temperature badge markers */
+.temp-badge {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(17, 24, 39, 0.90);
+  border: 1.5px solid var(--badge-color, #6b7280);
+  border-radius: 8px;
+  padding: 4px 9px 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.temp-badge:hover,
+.temp-badge:focus-visible {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--badge-color) 30%, transparent),
+    0 6px 16px rgba(0, 0, 0, 0.5);
+  outline: none;
+}
+
+/* small colored top accent line */
+.temp-badge::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: var(--badge-color, #6b7280);
+  border-radius: 0 0 2px 2px;
+}
+
+.temp-badge__warn {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.temp-badge__city {
+  display: block;
+  font-size: 10px;
+  font-weight: 500;
+  color: #9ca3af;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.temp-badge__temp {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  color: #f9fafb;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* Mapbox weather popup overrides */
+.weather-popup .mapboxgl-popup-content {
+  padding: 12px 14px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  border: 1px solid #e5e7eb;
+}
+
+.weather-popup .mapboxgl-popup-tip {
+  border-top-color: #fff;
+}
