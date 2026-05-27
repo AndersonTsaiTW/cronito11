@@ -43,6 +43,8 @@ interface AppState {
   setFilterPower: (filter: 'all' | 'online' | 'unstable' | 'outage') => void
   setFilterServices: (services: string[]) => void
   clearFilters: () => void
+  addReport: (shelterId: string, message: string) => void
+  addRequest: (shelterId: string, message: string) => void
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -92,4 +94,20 @@ export const useAppStore = create<AppState>((set) => ({
       filterPower: 'all',
       filterServices: [],
     }),
+  addReport: (shelterId, message) =>
+    set((state) => ({
+      shelters: state.shelters.map((shelter) =>
+        shelter.id === shelterId
+          ? { ...shelter, reports: [...shelter.reports, message] }
+          : shelter
+      ),
+    })),
+  addRequest: (shelterId, message) =>
+    set((state) => ({
+      shelters: state.shelters.map((shelter) =>
+        shelter.id === shelterId
+          ? { ...shelter, requests: [...shelter.requests, message] }
+          : shelter
+      ),
+    })),
 }))

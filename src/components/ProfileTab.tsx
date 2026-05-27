@@ -1,4 +1,5 @@
 import { useAppStore } from '../store'
+import { useState } from 'react'
 import type { Shelter } from '../types'
 
 const TYPE_LABELS: Record<Shelter['type'], string> = {
@@ -356,6 +357,84 @@ function ShelterDetailCard({ shelter }: { shelter: Shelter }) {
           )}
         </div>
       )}
+
+      {/* Share Update Form */}
+      <ShareUpdateForm shelter={shelter} />
+    </div>
+  )
+}
+
+function ShareUpdateForm({ shelter }: { shelter: Shelter }) {
+  const { addRequest } = useAppStore()
+  const [updateMessage, setUpdateMessage] = useState('')
+  const [updateType, setUpdateType] = useState<'observation' | 'issue' | 'resource'>('observation')
+  const [submitted, setSubmitted] = useState(false)
+
+  const handleShareUpdate = () => {
+    if (!updateMessage.trim()) return
+
+    const emoji = updateType === 'issue' ? '⚠️' : updateType === 'resource' ? '📦' : '📝'
+    const typeLabel = updateType === 'issue' ? 'Issue' : updateType === 'resource' ? 'Resource Needed' : 'Observation'
+    const fullMessage = `${emoji} User ${typeLabel}: ${updateMessage}`
+
+    addRequest(shelter.id, fullMessage)
+
+    setUpdateMessage('')
+    setUpdateType('observation')
+    setSubmitted(true)
+    setTimeout(() => setSubmitted(false), 2000)
+  }
+
+  return (
+    <div className="bg-gray-900 rounded-lg border border-gray-800 p-6">
+      <h3 className="text-lg font-bold text-white mb-4">💬 Share an Update</h3>
+      <p className="text-sm text-gray-400 mb-4">Help the community by sharing observations or reporting issues at this shelter</p>
+
+      {/* Update Type Selection */}
+      <div className="mb-4 flex gap-2">
+        {[
+          { id: 'observation', label: '📝 Observation', description: 'General observation' },
+          { id: 'issue', label: '⚠️ Issue', description: 'Report a problem' },
+          { id: 'resource', label: '📦 Resource Needed', description: 'Needed supplies/help' },
+        ].map((type) => (
+          <button
+            key={type.id}
+            onClick={() => setUpdateType(type.id as any)}
+            className={`px-3 py-2 rounded text-xs font-medium transition-all ${
+              updateType === type.id
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+            title={type.description}
+          >
+            {type.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Message Input */}
+      <textarea
+        value={updateMessage}
+        onChange={(e) => setUpdateMessage(e.target.value)}
+        placeholder="Share what you observe, any issues, or resources needed..."
+        rows={3}
+        className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-blue-600 focus:outline-none mb-3"
+      />
+
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-gray-500">{updateMessage.length} characters</p>
+        <button
+          onClick={handleShareUpdate}
+          disabled={!updateMessage.trim() || submitted}
+          className={`px-6 py-2 rounded-lg font-medium text-white transition-all ${
+            submitted
+              ? 'bg-green-600'
+              : 'bg-blue-600 hover:bg-blue-700 disabled:bg-gray-700 disabled:text-gray-500'
+          }`}
+        >
+          {submitted ? '✓ Update Shared!' : 'Share Update'}
+        </button>
+      </div>
     </div>
   )
 }

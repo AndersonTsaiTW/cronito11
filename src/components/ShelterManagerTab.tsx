@@ -15,7 +15,7 @@ const REPORT_TYPES = [
 ]
 
 export default function ShelterManagerTab() {
-  const { shelters, selectedShelterId, selectShelter } = useAppStore()
+  const { shelters, selectedShelterId, selectShelter, addReport } = useAppStore()
   const [selectedType, setSelectedType] = useState<string | null>(null)
   const [message, setMessage] = useState('')
   const [submitted, setSubmitted] = useState(false)
@@ -25,14 +25,10 @@ export default function ShelterManagerTab() {
   const handleSubmitReport = () => {
     if (!shelter || !selectedType || !message.trim()) return
 
-    // In a real app, this would be sent to a server
-    console.log('Report submitted:', {
-      shelterId: shelter.id,
-      shelterName: shelter.name,
-      type: selectedType,
-      message,
-      timestamp: new Date().toISOString(),
-    })
+    // Add report to the store
+    const reportType = REPORT_TYPES.find(t => t.id === selectedType)
+    const fullMessage = `${reportType?.emoji} ${reportType?.label}: ${message}`
+    addReport(shelter.id, fullMessage)
 
     setSubmitted(true)
     setTimeout(() => {
